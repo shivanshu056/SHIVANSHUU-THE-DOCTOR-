@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUMANVERSE 3D | Explore the Human Body</title>
+<style>
+:root{--bg:#070b16;--panel:rgba(15,24,43,.82);--line:rgba(107,190,255,.22);--cyan:#56d9ff;--purple:#a78bfa;--muted:#9aabc5}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% 25%,#14284a 0%,#090f20 42%,#050812 100%);color:#eef7ff;font-family:Inter,system-ui,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;background-image:radial-gradient(#8adfff 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent)}
+header{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:20px clamp(16px,4vw,54px);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+.logo{font-weight:900;letter-spacing:3px;font-size:18px}.logo span{color:var(--cyan)}
+.tag{font-size:11px;color:var(--muted);letter-spacing:2px}
+main{max-width:1250px;margin:auto;padding:38px 20px 60px}
+.hero{text-align:center;margin-bottom:28px}
+.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:4px;font-weight:800}
+h1{font-size:clamp(34px,6vw,64px);line-height:1.02;margin:12px 0;background:linear-gradient(100deg,#fff,#8ce6ff 55%,#bba6ff);-webkit-background-clip:text;color:transparent}
+.sub{color:var(--muted);max-width:650px;margin:0 auto;font-size:14px;line-height:1.7}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr);gap:18px;align-items:stretch}
+.stage,.info{border:1px solid var(--line);background:var(--panel);border-radius:22px;box-shadow:0 20px 70px #0006;backdrop-filter:blur(18px)}
+.stage{min-height:560px;position:relative;overflow:hidden}
+.stage-top{position:absolute;z-index:2;top:18px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.pill{border:1px solid var(--line);background:#091426c9;padding:8px 12px;border-radius:30px;font-size:10px;letter-spacing:1.5px;color:#bdeeff}
+#scene{position:absolute;inset:0;width:100%;height:100%}
+.hint{position:absolute;bottom:18px;left:20px;color:#9bb1ca;font-size:11px;letter-spacing:.5px;pointer-events:none}
+.info{padding:24px;display:flex;flex-direction:column}
+.info h2{margin:0 0 5px;font-size:23px}.info .kicker{font-size:10px;color:var(--cyan);letter-spacing:2px;font-weight:800}
+.info p{color:#b4c4d9;font-size:13px;line-height:1.7}
+.organ-list{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 18px}
+.organ-btn{background:#101d33;border:1px solid var(--line);color:#dceeff;border-radius:12px;padding:11px 10px;text-align:left;font-size:12px;cursor:pointer;transition:.2s}
+.organ-btn:hover,.organ-btn.active{border-color:var(--cyan);background:#14314a;transform:translateY(-2px);box-shadow:0 0 20px #56d9ff22}
+.organ-btn span{display:block;font-size:17px;margin-bottom:5px}
+.detail{margin-top:auto;border-top:1px solid var(--line);padding-top:16px}
+.detail h3{margin:0 0 7px;color:var(--cyan);font-size:17px}
+.fact{border:1px solid var(--line);border-radius:12px;padding:12px;background:#0a1425;color:#b8c9dc;font-size:12px;line-height:1.6}
+.footer{text-align:center;color:#70839d;font-size:10px;letter-spacing:.5px;margin-top:20px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.stage{min-height:430px}.info{min-height:440px}header{padding:16px}.tag{display:none}main{padding-top:28px}}
+</style>
+</head>
+<body>
+<header><div class="logo">HUMAN<span>VERSE</span> 3D</div><div class="tag">INTERACTIVE ANATOMY EXPLORER</div></header>
+<main>
+<section class="hero"><div class="eyebrow">DISCOVER WHAT'S INSIDE</div><h1>The Human Body,<br>In 3D.</h1><p class="sub">Explore a simplified 3D anatomy model. Select an organ to learn what it does, rotate the model, and discover the systems that keep the body working.</p></section>
+<section class="layout">
+<div class="stage"><div class="stage-top"><span class="pill">● LIVE 3D MODEL</span><span class="pill">DRAG TO ROTATE · SCROLL TO ZOOM</span></div><canvas id="scene"></canvas><div class="hint">Select an organ from the panel →</div></div>
+<aside class="info"><div class="kicker">BODY SYSTEMS / EXPLORER</div><h2>Choose an organ</h2><p>Tap any organ below to highlight it in the model and read a quick science fact.</p>
+<div class="organ-list">
+<button class="organ-btn active" data-organ="heart"><span>❤️</span>Heart</button>
+<button class="organ-btn" data-organ="brain"><span>🧠</span>Brain</button>
+<button class="organ-btn" data-organ="lungs"><span>🫁</span>Lungs</button>
+<button class="organ-btn" data-organ="stomach"><span>🟠</span>Stomach</button>
+<button class="organ-btn" data-organ="liver"><span>🟤</span>Liver</button>
+<button class="organ-btn" data-organ="skeleton"><span>🦴</span>Skeleton</button>
+<button class="organ-btn" data-organ="muscles"><span>💪</span>Muscles</button>
+<button class="organ-btn" data-organ="kidneys"><span>🫘</span>Kidneys</button>
+</div>
+<div class="detail"><div class="kicker">DID YOU KNOW?</div><h3 id="organTitle">Heart</h3><p id="organText">Your heart is a muscular pump. It sends blood around your body, carrying oxygen and nutrients to cells.</p><div class="fact" id="organFact">Quick fact: The heart has four chambers that work together to move blood.</div></div>
+</aside>
+</section>
+<div class="footer">EDUCATIONAL MODEL · ORGAN SHAPES ARE SIMPLIFIED · NOT FOR MEDICAL DIAGNOSIS</div>
+</main>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+const canvas=document.querySelector('#scene');
+const scene=new THREE.Scene(); scene.fog=new THREE.Fog(0x081020,8,18);
+const camera=new THREE.PerspectiveCamera(38,1,.1,100);camera.position.set(0,1.2,8.8);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
+scene.add(new THREE.HemisphereLight(0x9edfff,0x11152b,2));
+const key=new THREE.DirectionalLight(0x9beaff,2.5);key.position.set(4,6,5);scene.add(key);
+const rim=new THREE.PointLight(0x9b75ff,35,12);rim.position.set(-4,1,2);scene.add(rim);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=5;controls.maxDistance=12;controls.target.set(0,.1,0);
+const body=new THREE.Group();scene.add(body);
+const mat=(color,rough=.5,metal=.05)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
+const skin=mat(0x8db9ca,.65), bone=mat(0xc8d8df,.55), red=mat(0xf05270,.35), blue=mat(0x5a9fff,.4), purple=mat(0xa78bfa,.4), orange=mat(0xf6a65b,.5), liverMat=mat(0x9c624d,.55), muscle=mat(0xc45d75,.5), dark=mat(0x28445c,.7);
+function sphere(parent,name,pos,scale,material){const m=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),material);m.name=name;m.position.set(...pos);m.scale.set(...scale);parent.add(m);return m}
+function capsule(parent,a,b,r,material){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=new THREE.Vector3().subVectors(B,A);const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),16),material);m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());parent.add(m);sphere(parent,'boneJoint',a,[r,r,r],material);sphere(parent,'boneJoint',b,[r,r,r],material);return m}
+// translucent body silhouette
+const torso=sphere(body,'torso',[0,.15,0],[1.02,1.65,.48],new THREE.MeshPhysicalMaterial({color:0x4c9fba,transparent:true,opacity:.13,roughness:.25,metalness:.2,side:THREE.DoubleSide}));
+sphere(body,'head',[0,2.15,0],[.52,.62,.46],new THREE.MeshPhysicalMaterial({color:0x65c6df,transparent:true,opacity:.2,roughness:.3}));
+capsule(body,[-.42,1.25,0],[-1.15,.15,0],.19,skin);capsule(body,[.42,1.25,0],[1.15,.15,0],.19,skin);
+capsule(body,[-.35,-1.15,0],[-.42,-2.65,0],.23,skin);capsule(body,[.35,-1.15,0],[.42,-2.65,0],.23,skin);
+// simplified skeleton inside
+const bones=new THREE.Group();body.add(bones);
+capsule(bones,[0,1.55,0],[0,-1.05,0],.055,bone);
+for(let y=.9;y>-.8;y-=.22){const w=Math.sqrt(Math.max(.08,1-(y*.65)**2))*.66;capsule(bones,[-w,y,0],[w,y,0],.035,bone)}
+sphere(bones,'skull',[0,2.16,0],[.39,.45,.34],bone);
+capsule(bones,[-.28,-1.0,0],[-.42,-2.55,0],.07,bone);capsule(bones,[.28,-1.0,0],[.42,-2.55,0],.07,bone);
+capsule(bones,[-.3,1.2,0],[-1.1,.1,0],.06,bone);capsule(bones,[.3,1.2,0],[1.1,.1,0],.06,bone);
+bones.visible=false;
+// organs
+const organs={};
+organs.heart=sphere(body,'heart',[.12,.45,.52],[.28,.38,.23],red);
+organs.lungs=new THREE.Group();body.add(organs.lungs);sphere(organs.lungs,'leftLung',[-.38,.55,.35],[.32,.58,.2],blue);sphere(organs.lungs,'rightLung',[.42,.55,.35],[.32,.58,.2],blue);
+organs.brain=sphere(body,'brain',[0,2.18,.1],[.38,.35,.33],purple);
+organs.stomach=sphere(body,'stomach',[-.28,-.25,.42],[.34,.42,.22],orange);organs.stomach.rotation.z=-.35;
+organs.liver=sphere(body,'liver',[.34,-.05,.4],[.48,.23,.2],liverMat);
+organs.kidneys=new THREE.Group();body.add(organs.kidneys);sphere(organs.kidneys,'leftKidney',[-.38,-.55,-.12],[.18,.3,.16],red);sphere(organs.kidneys,'rightKidney',[.38,-.55,-.12],[.18,.3,.16],red);
+organs.muscles=new THREE.Group();body.add(organs.muscles);
+sphere(organs.muscles,'leftBicep',[-.78,.72,.06],[.16,.42,.17],muscle);sphere(organs.muscles,'rightBicep',[.78,.72,.06],[.16,.42,.17],muscle);
+sphere(organs.muscles,'leftQuad',[-.38,-1.65,.1],[.22,.58,.18],muscle);sphere(organs.muscles,'rightQuad',[.38,-1.65,.1],[.22,.58,.18],muscle);
+const all=[organs.heart,organs.lungs,organs.brain,organs.stomach,organs.liver,organs.kidneys,organs.muscles,bones];
+function select(id){all.forEach(o=>{o.visible=(o===bones)?id==='skeleton':true;if(o.material){o.material.emissive=new THREE.Color(o===organs[id]?0x174d68:0x000000);o.material.emissiveIntensity=o===organs[id]?1.1:0}});if(id==='skeleton')bones.visible=true;document.querySelectorAll('.organ-btn').forEach(b=>b.classList.toggle('active',b.dataset.organ===id));const data=copy[id];document.querySelector('#organTitle').textContent=data.title;document.querySelector('#organText').textContent=data.text;document.querySelector('#organFact').textContent=data.fact}
+const copy={
+heart:{title:'Heart',text:'Your heart is a muscular pump. It sends blood around your body, carrying oxygen and nutrients to cells.',fact:'Quick fact: The heart has four chambers that work together to move blood.'},
+brain:{title:'Brain',text:'The brain is the body’s control centre. It helps you think, remember, sense, move and coordinate many body functions.',fact:'Quick fact: The brain and spinal cord make up the central nervous system.'},
+lungs:{title:'Lungs',text:'Your lungs help you breathe. Oxygen moves into the blood and carbon dioxide moves out when you exhale.',fact:'Quick fact: The diaphragm is a major muscle that helps your lungs expand.'},
+stomach:{title:'Stomach',text:'The stomach is a muscular organ that mixes food with digestive juices and gradually passes it to the small intestine.',fact:'Quick fact: Digestion begins before food reaches the stomach.'},
+liver:{title:'Liver',text:'The liver processes nutrients, makes bile to help digest fats, and helps break down substances in the blood.',fact:'Quick fact: The liver performs hundreds of important functions.'},
+skeleton:{title:'Skeleton',text:'The skeleton supports your body, protects important organs and works with muscles to help you move.',fact:'Quick fact: An adult human skeleton typically has 206 bones.'},
+muscles:{title:'Muscles',text:'Muscles contract and relax to create movement. They also help maintain posture and produce body heat.',fact:'Quick fact: Your body has hundreds of skeletal muscles.'},
+kidneys:{title:'Kidneys',text:'The kidneys filter the blood, remove waste and extra water, and help balance salts in the body.',fact:'Quick fact: Most people have two kidneys, located toward the back of the abdomen.'}
+};
+document.querySelectorAll('.organ-btn').forEach(b=>b.addEventListener('click',()=>select(b.dataset.organ)));
+select('heart');
+function resize(){const r=canvas.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(canvas);resize();
+function animate(t){requestAnimationFrame(animate);controls.update();organs.heart.scale.set(.28*(1+.035*Math.sin(t*.006)),.38*(1+.035*Math.sin(t*.006)),.23);renderer.render(scene,camera)}animate(0);
+</script>
+</body>
+</html>
